@@ -58,8 +58,16 @@ class Plan with _$Plan {
     double? twoYearPrice,
     @JsonKey(name: 'three_year_price', fromJson: _priceFromJson, toJson: _priceToJson)
     double? threeYearPrice,
-    int? createdAt,
-    int? updatedAt,
+    @JsonKey(name: 'reset_price', fromJson: _priceFromJson, toJson: _priceToJson)
+    double? resetPrice,
+    @JsonKey(name: 'capacity_limit') dynamic capacityLimit,
+    @JsonKey(name: 'device_limit') int? deviceLimit,
+    required bool sell,
+    required bool renew,
+    @JsonKey(name: 'reset_traffic_method') int? resetTrafficMethod,
+    required int sort,
+    @JsonKey(name: 'created_at') int? createdAt,
+    @JsonKey(name: 'updated_at') int? updatedAt,
   }) = _Plan;
 
   const Plan._();
@@ -86,6 +94,8 @@ class Plan with _$Plan {
         return twoYearPrice;
       case 'three_year':
         return threeYearPrice;
+      case 'reset':
+        return resetPrice;
       default:
         return null;
     }
@@ -94,8 +104,53 @@ class Plan with _$Plan {
   /// 是否可见
   bool get isVisible => show;
 
+  /// 是否可售卖
+  bool get isSellable => sell;
+
+  /// 是否可续费
+  bool get isRenewable => renew;
+
   /// 是否有价格
   bool get hasPrice => [onetimePrice, monthPrice, quarterPrice, halfYearPrice, yearPrice, twoYearPrice, threeYearPrice].any((p) => p != null && p! > 0);
+
+  /// 获取容量限制（数字）
+  /// 返回 null 表示无限制，返回 0 表示售罄
+  int? get capacityLimitNumber {
+    if (capacityLimit == null) return null;
+    if (capacityLimit is int) return capacityLimit as int;
+    if (capacityLimit is String) return 0; // "Sold out" 返回 0
+    return null;
+  }
+
+  /// 是否售罄
+  bool get isSoldOut => capacityLimitNumber == 0;
+
+  /// 是否有容量限制
+  bool get hasCapacityLimit => capacityLimit != null && capacityLimitNumber != null && capacityLimitNumber! > 0;
+
+  /// 是否有设备限制
+  bool get hasDeviceLimit => deviceLimit != null && deviceLimit! > 0;
+
+  /// 是否可以重置流量
+  bool get canResetTraffic => resetPrice != null && resetPrice! > 0 && resetTrafficMethod != 2;
+
+  /// 获取流量重置方式文本
+  String getResetTrafficMethodText() {
+    switch (resetTrafficMethod) {
+      case 0:
+        return '每月1号';
+      case 1:
+        return '按月重置';
+      case 2:
+        return '不重置';
+      case 3:
+        return '每年1月1日';
+      case 4:
+        return '按年重置';
+      default:
+        return '跟随系统';
+    }
+  }
 }
 
 @freezed
@@ -109,6 +164,9 @@ class PlanResponse with _$PlanResponse {
 
   factory PlanResponse.fromJson(Map<String, dynamic> json) => _$PlanResponseFromJson(json);
 
-  /// 获取可用套餐
-  List<Plan> get availablePlans => data.where((p) => p.isVisible && p.hasPrice).toList();
+  /// 获取可用套餐（显示且可售卖且有价格且未售罄）
+  List<Plan> get availablePlans => data.where((p) => p.isVisible && p.isSellable && p.hasPrice && !p.isSoldOut).toList();
+  
+  /// 获取所有显示的套餐（包括售罄的）
+  List<Plan> get visiblePlans => data.where((p) => p.isVisible).toList();
 }
