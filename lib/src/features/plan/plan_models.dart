@@ -42,6 +42,7 @@ class Plan with _$Plan {
     required String name,
     List<String>? tags,
     @JsonKey(name: 'speed_limit') int? speedLimit,
+    @JsonKey(name: 'show', fromJson: _intToBool, toJson: _boolToInt)
     required bool show,
     String? content,
     @JsonKey(name: 'onetime_price', fromJson: _priceFromJson, toJson: _priceToJson)
@@ -62,7 +63,9 @@ class Plan with _$Plan {
     double? resetPrice,
     @JsonKey(name: 'capacity_limit') dynamic capacityLimit,
     @JsonKey(name: 'device_limit') int? deviceLimit,
+    @JsonKey(name: 'sell', fromJson: _intToBool, toJson: _boolToInt)
     required bool sell,
+    @JsonKey(name: 'renew', fromJson: _intToBool, toJson: _boolToInt)
     required bool renew,
     @JsonKey(name: 'reset_traffic_method') int? resetTrafficMethod,
     int? sort,

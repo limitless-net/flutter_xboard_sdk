@@ -3,6 +3,7 @@ import 'package:flutter_xboard_sdk/src/features/plan/plan_models.dart';
 import 'package:flutter_xboard_sdk/src/common/models/api_response.dart';
 import 'package:flutter_xboard_sdk/src/exceptions/xboard_exceptions.dart';
 
+
 class PlanApi {
   final HttpService _httpService;
 
@@ -13,7 +14,9 @@ class PlanApi {
     try {
       final result = await _httpService.getRequest('/api/v1/user/plan/fetch');
       return ApiResponse.fromJson(result, (json) => (json as List<dynamic>).map((e) => Plan.fromJson(e as Map<String, dynamic>)).toList());
-    } catch (e) {
+    } catch (e, stack) {
+      print('Error: $e');
+      print('Stack trace:\n$stack');
       if (e is XBoardException) rethrow;
       throw ApiException('获取套餐列表时发生错误: $e');
     }
