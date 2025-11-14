@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/services.dart';
+import 'package:socks5_proxy/socks_client.dart';
 import '../exceptions/xboard_exceptions.dart';
 import '../core/token/token_manager.dart';
 import '../core/token/auth_interceptor.dart';
@@ -47,13 +48,26 @@ class HttpService {
 
     // 配置客户端证书和SSL验证
     (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      print('[XBoardSDK] 🔨 创建 HttpClient...');
       final client = HttpClient();
-      
+
       // 配置代理
       if (httpConfig.proxyUrl != null && httpConfig.proxyUrl!.isNotEmpty) {
-        client.findProxy = (uri) {
-          return "PROXY ${httpConfig.proxyUrl}";
-        };
+        print('[XBoardSDK] 🔌 配置代理: ${httpConfig.proxyUrl}');
+
+        final proxyConfig = _parseProxyConfig(httpConfig.proxyUrl!);
+        print('[XBoardSDK] 🔄 解析: host=${proxyConfig['host']}, port=${proxyConfig['port']}, auth=${proxyConfig['username'] != null}');
+
+        // 使用 socks5_proxy 配置代理
+        final proxySettings = ProxySettings(
+          InternetAddress(proxyConfig['host']!),
+          int.parse(proxyConfig['port']!),
+          username: proxyConfig['username'],
+          password: proxyConfig['password'],
+        );
+
+        SocksTCPClient.assignToHttpClient(client, [proxySettings]);
+        print('[XBoardSDK] ✅ SOCKS5 代理配置完成');
       }
       
       // 配置SSL证书验证
@@ -77,8 +91,17 @@ class HttpService {
 
     // 添加拦截器（生产环境移除日志拦截器）
 
-    // 添加响应格式化拦截器
+    // 添加请求日志和响应格式化拦截器
     _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        // 打印请求信息和代理状态
+        final fullUrl = options.uri.toString();
+        final proxyStatus = httpConfig.proxyUrl != null && httpConfig.proxyUrl!.isNotEmpty;
+        final proxyInfo = proxyStatus ? httpConfig.proxyUrl : 'DIRECT';
+        print('[XBoardSDK] 📡 ${options.method} $fullUrl | proxy: $proxyStatus ($proxyInfo)');
+
+        handler.next(options);
+      },
       onResponse: (response, handler) {
         // 检查是否需要解混淆
         response.data = _deobfuscateResponse(response);
@@ -410,4 +433,54 @@ class HttpService {
 
   /// 获取TokenManager
   TokenManager? get tokenManager => _tokenManager;
+
+  /// 解析代理配置
+  ///
+  /// 输入格式:
+  /// - `socks5://user:pass@host:port`
+  /// - `socks5://host:port`
+  /// - `http://user:pass@host:port`
+  ///
+  /// 返回: { host, port, username?, password? }
+  static Map<String, String?> _parseProxyConfig(String proxyUrl) {
+    String url = proxyUrl.trim();
+
+    // 去除协议前缀
+    if (url.toLowerCase().startsWith('socks5://')) {
+      url = url.substring(9);
+    } else if (url.toLowerCase().startsWith('http://')) {
+      url = url.substring(7);
+    } else if (url.toLowerCase().startsWith('https://')) {
+      url = url.substring(8);
+    }
+
+    String? username;
+    String? password;
+    String hostPort = url;
+
+    // 解析认证信息 user:pass@host:port
+    if (url.contains('@')) {
+      final atIndex = url.lastIndexOf('@');
+      final authPart = url.substring(0, atIndex);
+      hostPort = url.substring(atIndex + 1);
+
+      if (authPart.contains(':')) {
+        final colonIndex = authPart.indexOf(':');
+        username = authPart.substring(0, colonIndex);
+        password = authPart.substring(colonIndex + 1);
+      }
+    }
+
+    // 解析 host:port
+    final parts = hostPort.split(':');
+    final host = parts[0];
+    final port = parts.length > 1 ? parts[1] : '1080';
+
+    return {
+      'host': host,
+      'port': port,
+      'username': username,
+      'password': password,
+    };
+  }
 } 

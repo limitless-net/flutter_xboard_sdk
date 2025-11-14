@@ -27,6 +27,7 @@ class InviteCode with _$InviteCode {
 
 @freezed
 class InviteInfo with _$InviteInfo {
+  @JsonSerializable(explicitToJson: true)
   const factory InviteInfo({
     required List<InviteCode> codes,
     required List<int> stat,
