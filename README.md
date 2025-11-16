@@ -434,6 +434,31 @@ flutter test test/integration_test.dart
 
 ---
 
+## 🔧 关于对接“旧版”Xboard
+
+新版Xboard在HTTP头中，使用标准的"authorization: Bearer $token"格式。
+旧版Xboard缺少Bearer字符串，而是使用"authorization: $token"格式。有"Bearer"
+存在时调用会认证失败，返回403错误。因此在对接旧版Xboard时需要去掉Bearer
+字符串。
+
+这个操作可以在nginx反向代理的配置中实现。例如，
+
+``` nginx
+location /api {
+    set $auth_header "";
+    # Check if the Authorization header exists and starts with "Bearer"
+    if ($http_authorization ~* "^Bearer\s+(.+)") {
+        set $auth_header $1;
+    }
+    # Set the modified Authorization header without "Bearer"
+    proxy_set_header Authorization $auth_header;
+
+    proxy_pass         http://127.0.0.1:7001/api;
+}
+```
+
+---
+
 ## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
