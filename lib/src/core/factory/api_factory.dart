@@ -1,6 +1,22 @@
 import '../http/http_service.dart';
 import '../../contracts/contracts.dart';
 import '../../panels/xboard/xboard_export.dart';
+import '../../panels/v2board/apis/v2board_login_api.dart';
+import '../../panels/v2board/apis/v2board_register_api.dart';
+import '../../panels/v2board/apis/v2board_user_info_api.dart';
+import '../../panels/v2board/apis/v2board_send_email_code_api.dart';
+import '../../panels/v2board/apis/v2board_reset_password_api.dart';
+import '../../panels/v2board/apis/v2board_plan_api.dart';
+import '../../panels/v2board/apis/v2board_order_api.dart';
+import '../../panels/v2board/apis/v2board_payment_api.dart';
+import '../../panels/v2board/apis/v2board_subscription_api.dart';
+import '../../panels/v2board/apis/v2board_invite_api.dart';
+import '../../panels/v2board/apis/v2board_balance_api.dart';
+import '../../panels/v2board/apis/v2board_ticket_api.dart';
+import '../../panels/v2board/apis/v2board_notice_api.dart';
+import '../../panels/v2board/apis/v2board_coupon_api.dart';
+import '../../panels/v2board/apis/v2board_config_api.dart';
+import '../../panels/v2board/apis/v2board_app_api.dart';
 import 'panel_type.dart';
 
 /// API 工厂
@@ -17,7 +33,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardInviteApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board InviteApi not implemented yet');
+        return V2BoardInviteApi(_httpService);
     }
   }
 
@@ -27,7 +43,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardRegisterApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board RegisterApi not implemented yet');
+        return V2BoardRegisterApi(_httpService);
     }
   }
 
@@ -37,7 +53,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardUserInfoApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board UserInfoApi not implemented yet');
+        return V2BoardUserInfoApi(_httpService);
     }
   }
 
@@ -47,7 +63,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardOrderApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board OrderApi not implemented yet');
+        return V2BoardOrderApi(_httpService);
     }
   }
 
@@ -57,7 +73,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardPlanApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board PlanApi not implemented yet');
+        return V2BoardPlanApi(_httpService);
     }
   }
 
@@ -67,7 +83,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardBalanceApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board BalanceApi not implemented yet');
+        return V2BoardBalanceApi(_httpService);
     }
   }
 
@@ -77,7 +93,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardConfigApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board ConfigApi not implemented yet');
+        return V2BoardConfigApi(_httpService);
     }
   }
 
@@ -87,7 +103,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardLoginApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board LoginApi not implemented yet');
+        return V2BoardLoginApi(_httpService);
     }
   }
 
@@ -97,7 +113,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardTicketApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board TicketApi not implemented yet');
+        return V2BoardTicketApi(_httpService);
     }
   }
 
@@ -107,7 +123,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardSubscriptionApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board SubscriptionApi not implemented yet');
+        return V2BoardSubscriptionApi(_httpService);
     }
   }
 
@@ -117,7 +133,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardNoticeApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board NoticeApi not implemented yet');
+        return V2BoardNoticeApi(_httpService);
     }
   }
 
@@ -127,7 +143,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardCouponApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board CouponApi not implemented yet');
+        return V2BoardCouponApi(_httpService);
     }
   }
 
@@ -137,7 +153,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardAppApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board AppApi not implemented yet');
+        return V2BoardAppApi(_httpService);
     }
   }
 
@@ -147,7 +163,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardPaymentApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board PaymentApi not implemented yet');
+        return V2BoardPaymentApi(_httpService);
     }
   }
 
@@ -157,7 +173,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardSendEmailCodeApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board SendEmailCodeApi not implemented yet');
+        return V2BoardSendEmailCodeApi(_httpService);
     }
   }
 
@@ -167,7 +183,7 @@ class ApiFactory {
       case PanelType.xboard:
         return XBoardResetPasswordApi(_httpService);
       case PanelType.v2board:
-        throw UnimplementedError('V2Board ResetPasswordApi not implemented yet');
+        return V2BoardResetPasswordApi(_httpService);
     }
   }
 }
