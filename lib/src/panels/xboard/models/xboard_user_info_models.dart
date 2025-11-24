@@ -34,26 +34,26 @@ dynamic _telegramIdToJson(String? value) => value;
 class UserInfo with _$UserInfo {
   const factory UserInfo({
     required String email,
-    @JsonKey(name: 'transfer_enable') required double transferEnable,
+    @JsonKey(name: 'transfer_enable') @Default(0) double transferEnable,
     @JsonKey(name: 'last_login_at', fromJson: _fromUnixTimestamp, toJson: _toUnixTimestamp)
     DateTime? lastLoginAt,
     @JsonKey(name: 'created_at', fromJson: _fromUnixTimestamp, toJson: _toUnixTimestamp)
     DateTime? createdAt,
-    @JsonKey(fromJson: _intToBool, toJson: _boolToInt) required bool banned,
+    @JsonKey(fromJson: _intToBool, toJson: _boolToInt) @Default(false) bool banned,
     @JsonKey(name: 'remind_expire', fromJson: _intToBool, toJson: _boolToInt)
-    required bool remindExpire,
+    @Default(true) bool remindExpire,
     @JsonKey(name: 'remind_traffic', fromJson: _intToBool, toJson: _boolToInt)
-    required bool remindTraffic,
+    @Default(true) bool remindTraffic,
     @JsonKey(name: 'expired_at', fromJson: _fromUnixTimestamp, toJson: _toUnixTimestamp)
     DateTime? expiredAt,
-    required double balance,
-    @JsonKey(name: 'commission_balance') required double commissionBalance,
-    @JsonKey(name: 'plan_id') required int planId,
+    @Default(0) double balance,
+    @JsonKey(name: 'commission_balance') @Default(0) double commissionBalance,
+    @JsonKey(name: 'plan_id') int? planId,
     double? discount,
     @JsonKey(name: 'commission_rate') double? commissionRate,
     @JsonKey(name: 'telegram_id', fromJson: _telegramIdFromJson, toJson: _telegramIdToJson) String? telegramId,
     required String uuid,
-    @JsonKey(name: 'avatar_url') required String avatarUrl,
+    @JsonKey(name: 'avatar_url') @Default('') String avatarUrl,
   }) = _UserInfo;
 
   const UserInfo._();

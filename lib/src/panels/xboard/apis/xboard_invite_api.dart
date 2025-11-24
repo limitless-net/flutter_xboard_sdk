@@ -13,12 +13,32 @@ class XBoardInviteApi implements InviteApi {
   @override
   Future<ApiResponse<InviteCode>> generateInviteCode() async {
     try {
+      // 调用生成邀请码接口（返回 boolean）
       final response = await _httpService.getRequest('/api/v1/user/invite/save');
-      return ApiResponse.fromJson(
-        response,
-        (json) => InviteCode.fromJson(json as Map<String, dynamic>),
+      
+      // 检查是否成功
+      if (response['data'] != true) {
+        throw ApiException('Generate invite code failed');
+      }
+      
+      // 重新获取邀请信息以获取新生成的邀请码
+      final inviteInfoResponse = await _httpService.getRequest('/api/v1/user/invite/fetch');
+      final inviteInfo = InviteInfo.fromJson(inviteInfoResponse['data'] as Map<String, dynamic>);
+      
+      // 获取最新的邀请码（第一个）
+      if (inviteInfo.codes.isEmpty) {
+        throw ApiException('No invite code found after generation');
+      }
+      
+      final newCode = inviteInfo.codes.first;
+      
+      return ApiResponse(
+        success: true,
+        data: newCode,
+        message: response['message'] as String?,
       );
     } catch (e) {
+      if (e is XBoardException) rethrow;
       throw ApiException('Generate invite code failed: $e');
     }
   }
